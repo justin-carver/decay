@@ -1,16 +1,16 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import './index.css'
-import Decay from './Decay'
-import reportWebVitals from './reportWebVitals'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import Decay from './Decay';
+import reportWebVitals from './reportWebVitals';
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
     // React Strict Mode is causing components to render twice during development.
     // <React.StrictMode>
     <Decay />
     // </React.StrictMode>
-)
+);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
