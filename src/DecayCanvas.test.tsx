@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Decay from './Decay';
+import DecayCanvas from './components/DecayCanvas';
 
 test('renders learn react link', () => {
-    render(<Decay />);
+    // render(<DecayCanvas  />);
     const linkElement = screen.getByText(/learn react/i);
     expect(linkElement).toBeInTheDocument();
 });
