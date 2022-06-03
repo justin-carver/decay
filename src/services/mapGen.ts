@@ -9,6 +9,7 @@ export interface IMap {
     cellWidth?: number;
     cellHeight?: number;
     tiles: Tile[][];
+    seed?: string;
     name?: string;
     historyLength?: number;
 }
@@ -25,6 +26,7 @@ export const generateMap = (
     height: number,
     cWidth?: number,
     cHeight?: number,
+    seed?: string,
     tiles?: Tile[][], // Not setup for Simplex3D
     name?: string
 ): IMap => {
@@ -33,7 +35,7 @@ export const generateMap = (
         mapHeight: height,
         cellWidth: cWidth,
         cellHeight: cHeight,
-        tiles: initMapTiles(width, height, cWidth, cHeight, 10, 'roguelikes'),
+        tiles: initMapTiles(width, height, cWidth, cHeight, 3.5, seed, 2),
         name: '',
         historyLength: 0,
     };
@@ -55,20 +57,21 @@ export const initMapTiles = (
     cWidth: number = 0,
     cHeight: number = 0,
     resolution: number = 4,
-    seed: string = 'seed'
+    seed: string = 'seed',
+    iterations: number
 ): Tile[][] => {
     let tiles: Tile[][] = [];
-    const simplexMap = generate2DSimplexNoise(width, height, resolution, seed); // * This should be a choice later.
-    let yOffset: number = 0;
+    const simplexMap = generate2DSimplexNoise(width, height, resolution, seed, iterations); // * This should be a choice later.
+    let offsetY: number = 0;
     // 2D Tile Init Mapping
     for (let i = 0; i < width; i++) {
-        let xOffset: number = 0;
+        let offsetX: number = 0;
         tiles[i] = [];
         for (let j = 0; j < height; j++) {
             tiles[i].push({
                 type: '',
                 cell: [i, j],
-                coords: [xOffset, yOffset],
+                coords: [offsetX, offsetY],
                 noise: simplexMap[i][j],
                 // Render pass
                 render: (ctx: CanvasRenderingContext2D, coords: number[], noise: number) => {
@@ -79,14 +82,13 @@ export const initMapTiles = (
 
                     ctx.fillStyle = '#000';
                     ctx.font = 'bold 32px monospace'; // TODO: Add to config.
-                    ctx.fillText('e', coords[0] + cWidth / 2, coords[1] + cHeight / 2);
+                    ctx.fillText('', coords[0] + cWidth / 2, coords[1] + cHeight / 2);
                 },
             });
-            xOffset += cWidth;
+            offsetX += cWidth;
         }
-        yOffset += cHeight;
+        offsetY += cHeight;
     }
-    console.log(tiles);
     return tiles;
 };
 
@@ -98,26 +100,39 @@ export const initMapTiles = (
  */
 export const calculateTileColor = (noise: number, lightLevel?: number): string => {
     let [r, g, b, a] = [0, 0, 0, 1];
-    if (noise < 0.2) return `rgba(${r + 20}, ${g + 20}, ${b + 20}, ${a})`;
-    if (noise < 0.4) return `rgba(${r + 60}, ${g + 60}, ${b + 60}, ${a})`;
+    if (noise < 0.1) return `rgba(${r + 0}, ${g + 25}, ${b + 60}, ${a})`;
+    if (noise < 0.2) return `rgba(${r + 0}, ${g + 25}, ${b + 125}, ${a})`;
+    if (noise < 0.3) return `rgba(${r + 0}, ${g + 25}, ${b + 175}, ${a})`;
+    if (noise < 0.4) return `rgba(${r + 0}, ${g + 25}, ${b + 200}, ${a})`;
     if (noise < 0.6) return `rgba(${r + 120}, ${g + 120}, ${b + 120}, ${a})`;
     if (noise < 0.7) return `rgba(${r + 180}, ${g + 180}, ${b + 180}, ${a})`;
     if (noise < 0.9) return `rgba(${r + 220}, ${g + 220}, ${b + 220}, ${a})`;
-    return '#222';
+    return '#FFFFFF';
 };
 
+// TODO: Restructure to allow others to adapt the method. Add the offsets as conditional parameters?
 export const generate2DSimplexNoise = (
     width: number,
     height: number,
     resolution: number = 4,
-    seed?: string
+    seed?: string,
+    iterations?: number
 ): number[][] => {
+    let offsetX = 0;
+    let offsetY = 0;
     const map: number[][] = [];
     const simplex = new SimplexNoise(seed);
     for (let i = 0; i < width; i++) {
         map[i] = [];
         for (let j = 0; j < height; j++) {
-            map[i].push(simplex.noise2D(i / resolution, j / resolution) / 2 + 0.5);
+            map[i].push(
+                simplex.noise2D(
+                    (i / width) * resolution + offsetX,
+                    (j / height) * resolution + offsetY
+                ) /
+                    2 +
+                    0.5
+            );
         }
     }
     return map;

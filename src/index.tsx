@@ -6,16 +6,17 @@ import DecayCanvas, { CanvasConfig } from './components/DecayCanvas';
 import reportWebVitals from './reportWebVitals';
 
 /**
- *  @param terminalHeight - Width of canvas in pixels.
- *  @param terminalWidth - Height of terminal in pixels.
+ *  @param terminalWidth - Width of canvas in pixels.
+ *  @param terminalHeight - Height of terminal in pixels.
  *  @param tileHeight - Width of tile within canvas component.
  *  @param tileWidth - Height of tile within canvas component.
  */
 const config: CanvasConfig = {
-    terminalWidth: 25,
-    terminalHeight: 25,
-    tileWidth: 24,
-    tileHeight: 24,
+    // TODO: Fix the issue with having to flip terminalWidth and terminalHeight
+    terminalWidth: 50,
+    terminalHeight: 50,
+    tileWidth: 16,
+    tileHeight: 16,
 };
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);

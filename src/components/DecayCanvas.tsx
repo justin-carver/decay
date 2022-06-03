@@ -14,10 +14,11 @@ const DecayCanvas = (config: CanvasConfig) => {
         const canvas = document.querySelector('.DecayCanvas') as HTMLCanvasElement;
         const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
         let map = generateMap(
-            config.terminalWidth,
             config.terminalHeight,
+            config.terminalWidth,
             config.tileWidth,
-            config.tileHeight
+            config.tileHeight,
+            'mapSeed'
         );
 
         // Iterate through every tile, call it's render function.
@@ -26,9 +27,8 @@ const DecayCanvas = (config: CanvasConfig) => {
                 if (tile.render !== undefined) tile.render(ctx, tile.coords, tile.noise);
             });
         });
-        console.log(map);
     }, []);
-    return <canvas className="DecayCanvas" width={800} height={600}></canvas>;
+    return <canvas className="DecayCanvas" width={1024} height={720}></canvas>;
 };
 
 export default DecayCanvas;
