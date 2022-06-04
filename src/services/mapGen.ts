@@ -1,48 +1,56 @@
 import SimplexNoise from 'simplex-noise';
-import Tile from '../components/Tile';
+import Tile from './tile';
+import Map from './map';
+import { ChangeEventHandler } from 'react';
 
 // const DEFAULT_HISTORY_LENGTH: number = 600;
 
-export interface IMap {
-    mapWidth: number;
-    mapHeight: number;
-    cellWidth?: number;
-    cellHeight?: number;
-    tiles: Tile[][];
-    seed?: string;
-    name?: string;
-    historyLength?: number;
+export enum noiseType {
+    Simplex2D,
+    Perlin2D,
+    Vernoi,
 }
 
-/**
+/** // TODO: Update params
  * Generates a tile-based map given the parameters.
  * @param width - Width of generated map.
  * @param height - Height of generated map.
+ * @param offsetX - The X axis offset for use within noise function rendering.
+ * @param offsetY - The Y axis offset for use within noise function rendering.
+ * @param tiles - (Optional) Allows importing of custom Tile[][] object.
  * @param cWidth - Cell Width (Only matters if canvas is rendering)
  * @param cHeight - Cell Height (Only matters if canvas is rendering)
  */
 export const generateMap = (
     width: number,
     height: number,
+    offsetX: number = 0,
+    offsetY: number = 0,
+    tiles?: Tile[][],
     cWidth?: number,
     cHeight?: number,
     seed?: string,
-    tiles?: Tile[][], // Not setup for Simplex3D
     name?: string
-): IMap => {
-    const map: IMap = {
+): Map => {
+    const map: Map = {
         mapWidth: width,
         mapHeight: height,
         cellWidth: cWidth,
         cellHeight: cHeight,
-        tiles: initMapTiles(width, height, cWidth, cHeight, 3.5, seed, 2),
+        offsetX: offsetX,
+        offsetY: offsetY,
+        tiles: (() => {
+            if (tiles === undefined) {
+                return initMapTiles(width, height, cWidth, cHeight, 6, offsetX, offsetY, seed, 2);
+            }
+        })() as Tile[][],
         name: '',
         historyLength: 0,
     };
     return map;
 };
 
-/**
+/** // TODO: Add params
  * Initializing and sets up inital map tiles. Even if no rendering will occur, map tiles must be calculated.
  * @param width - Width of terminal.
  * @param height - Height of terminal.
@@ -57,15 +65,23 @@ export const initMapTiles = (
     cWidth: number = 0,
     cHeight: number = 0,
     resolution: number = 4,
+    offsetX: number,
+    offsetY: number,
     seed: string = 'seed',
     iterations: number
 ): Tile[][] => {
     let tiles: Tile[][] = [];
-    const simplexMap = generate2DSimplexNoise(width, height, resolution, seed, iterations); // * This should be a choice later.
-    let offsetY: number = 0;
+    const simplexMap = generate2DSimplexNoise(
+        width,
+        height,
+        resolution,
+        offsetX,
+        offsetY,
+        seed,
+        iterations
+    ); // * This should be a choice later.
     // 2D Tile Init Mapping
     for (let i = 0; i < width; i++) {
-        let offsetX: number = 0;
         tiles[i] = [];
         for (let j = 0; j < height; j++) {
             tiles[i].push({
@@ -93,6 +109,26 @@ export const initMapTiles = (
 };
 
 /**
+ * Reference the original noise map function for more detailed paramaters.
+ * @param noise - Enum of noiseType regarding which noise function to produce.
+ * @param w - Width of noise map.
+ * @param h - Height of noise map.
+ * @param r - Resolution of noise map.
+ * @param oX - Offset on the X axis.
+ * @param oY - Offset on the Y axis.
+ */
+export const updateNoiseMap = (
+    noise: noiseType,
+    w: number,
+    h: number,
+    r: number,
+    oX: number,
+    oY: number
+): ChangeEventHandler<HTMLInputElement> | any => {
+    if (noise === noiseType.Simplex2D) return generate2DSimplexNoise(w, h, r, oX, oY);
+};
+
+/**
  *
  * @param noise - The amount of noise generated on the current tile.
  * @param lightLevel - The level of light illuminating from this tile.
@@ -114,12 +150,12 @@ export const calculateTileColor = (noise: number, lightLevel?: number): string =
 export const generate2DSimplexNoise = (
     width: number,
     height: number,
-    resolution: number = 4,
+    resolution: number = 4, // Maybe should be called 'scale' instead?
+    offsetX: number = 0,
+    offsetY: number = 0,
     seed?: string,
     iterations?: number
 ): number[][] => {
-    let offsetX = 0;
-    let offsetY = 0;
     const map: number[][] = [];
     const simplex = new SimplexNoise(seed);
     for (let i = 0; i < width; i++) {

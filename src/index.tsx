@@ -4,6 +4,7 @@ import './index.css';
 import Decay from './Decay';
 import DecayCanvas, { CanvasConfig } from './components/DecayCanvas';
 import reportWebVitals from './reportWebVitals';
+import GameMaster from './components/GameMaster';
 
 /**
  *  @param terminalWidth - Width of canvas in pixels.
@@ -13,8 +14,8 @@ import reportWebVitals from './reportWebVitals';
  */
 const config: CanvasConfig = {
     // TODO: Fix the issue with having to flip terminalWidth and terminalHeight
-    terminalWidth: 50,
-    terminalHeight: 50,
+    terminalWidth: 100,
+    terminalHeight: 100,
     tileWidth: 16,
     tileHeight: 16,
 };
@@ -23,8 +24,9 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
     // React Strict Mode is causing components to render twice during development.
     // <React.StrictMode>
-    <Decay>
-        <DecayCanvas {...config} />
+    <Decay {...config}>
+        <GameMaster />
+        <DecayCanvas />
     </Decay>
     // </React.StrictMode>
 );
