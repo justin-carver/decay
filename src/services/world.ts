@@ -1,6 +1,6 @@
 import ITile from './tile';
 
-export default interface IMap {
+export default interface IWorld {
     mapWidth: number;
     mapHeight: number;
     cellWidth?: number;
@@ -13,6 +13,6 @@ export default interface IMap {
     historyLength?: number;
 }
 
-export const getCurrentSessionMap = (): IMap => {
-    return {} as IMap;
+export const getCurrentSessionMap = (): IWorld => {
+    return {} as IWorld;
 };

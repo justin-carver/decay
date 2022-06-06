@@ -1,9 +1,7 @@
 import SimplexNoise from 'simplex-noise';
-import Tile from './tile';
-import Map from './map';
+import ITile from './tile';
+import IWorld from './world';
 import { ChangeEventHandler } from 'react';
-
-// const DEFAULT_HISTORY_LENGTH: number = 600;
 
 export enum noiseType {
     Simplex2D,
@@ -11,29 +9,31 @@ export enum noiseType {
     Vernoi,
 }
 
+export const tileRender = (callback: void) => callback; // ? Is this needed?
+
 /** // TODO: Update params
- * Generates a tile-based map given the parameters.
- * @param width - Width of generated map.
- * @param height - Height of generated map.
+ * Generates a tile-based World given the parameters.
+ * @param width - Width of generated World.
+ * @param height - Height of generated World.
  * @param offsetX - The X axis offset for use within noise function rendering.
  * @param offsetY - The Y axis offset for use within noise function rendering.
  * @param tiles - (Optional) Allows importing of custom Tile[][] object.
  * @param cWidth - Cell Width (Only matters if canvas is rendering)
  * @param cHeight - Cell Height (Only matters if canvas is rendering)
  */
-export const generateMap = (
+export const generateWorld = (
     width: number,
     height: number,
     offsetX: number = 0,
     offsetY: number = 0,
-    tiles?: Tile[][],
+    tiles?: ITile[][],
     cWidth?: number,
     cHeight?: number,
     seed?: string,
     name?: string
-): Map => {
-    const map: Map = {
-        mapWidth: width,
+): IWorld => {
+    const World: IWorld = {
+        mapWidth: width, // TODO: Should these be called mapWidth or worldWidth? Can the world have a width?
         mapHeight: height,
         cellWidth: cWidth,
         cellHeight: cHeight,
@@ -41,25 +41,25 @@ export const generateMap = (
         offsetY: offsetY,
         tiles: (() => {
             if (tiles === undefined) {
-                return initMapTiles(width, height, cWidth, cHeight, 6, offsetX, offsetY, seed, 2);
+                return initWorldTiles(width, height, cWidth, cHeight, 6, offsetX, offsetY, seed, 2);
             }
-        })() as Tile[][],
+        })() as ITile[][],
         name: '',
         historyLength: 0,
     };
-    return map;
+    return World;
 };
 
 /** // TODO: Add params
- * Initializing and sets up inital map tiles. Even if no rendering will occur, map tiles must be calculated.
+ * Initializing and sets up inital World tiles. Even if no rendering will occur, World tiles must be calculated.
  * @param width - Width of terminal.
  * @param height - Height of terminal.
  * @param cWidth - Cell Width (Optional): Defaults to 0 if no tile rendering will take place.
  * @param cHeight - Cell Height (Optional): Defaults to 0 if no tile rendering will take place.
  * @param seed - Seed used for noise generation.
- * @returns {Tile[][]}
+ * @returns {ITile[][]}
  */
-export const initMapTiles = (
+export const initWorldTiles = (
     width: number,
     height: number,
     cWidth: number = 0,
@@ -69,8 +69,8 @@ export const initMapTiles = (
     offsetY: number,
     seed: string = 'seed',
     iterations: number
-): Tile[][] => {
-    let tiles: Tile[][] = [];
+): ITile[][] => {
+    let tiles: ITile[][] = [];
     const simplexMap = generate2DSimplexNoise(
         width,
         height,
@@ -83,22 +83,30 @@ export const initMapTiles = (
     // 2D Tile Init Mapping
     for (let i = 0; i < width; i++) {
         tiles[i] = [];
+        offsetX = 0;
         for (let j = 0; j < height; j++) {
             tiles[i].push({
                 type: '',
                 cell: [i, j],
                 coords: [offsetX, offsetY],
                 noise: simplexMap[i][j],
-                // Render pass
+                // Render Template
+                // TODO: Decouple render to allow custom user injection. Use 'tileRender' callback function.
                 render: (ctx: CanvasRenderingContext2D, coords: number[], noise: number) => {
+                    // Tile Background Color
                     ctx.fillStyle = calculateTileColor(noise);
                     ctx.fillRect(coords[0], coords[1], cWidth, cHeight);
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
 
+                    // Tile Outlines
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+                    ctx.strokeRect(coords[0], coords[1], cWidth, cHeight);
+
+                    // Tile Character
                     ctx.fillStyle = '#000';
-                    ctx.font = 'bold 32px monospace'; // TODO: Add to config.
-                    ctx.fillText('', coords[0] + cWidth / 2, coords[1] + cHeight / 2);
+                    ctx.font = 'bold 18px monospace'; // TODO: Add to config.
+                    ctx.fillText('w', coords[0] + cWidth / 2, coords[1] + cHeight / 2);
                 },
             });
             offsetX += cWidth;
