@@ -1,17 +1,9 @@
+import { useEffect } from 'react';
 import './DecayCanvas.css';
 import ITile from '../services/tile';
-import { ReactElement, useEffect } from 'react';
-import { useStore } from './Engine';
-
-export interface CanvasConfig {
-    terminalWidth: number;
-    terminalHeight: number;
-    tileWidth: number;
-    tileHeight: number;
-}
+import IPlayer from '../components/player';
 
 const DecayCanvas = (props: any) => {
-    let gm = useStore((state: any) => state.gameMaster);
     // Render Loop
     useEffect(() => {
         // TODO: Should include prop boolean for conditional rendering ticks.
@@ -19,8 +11,9 @@ const DecayCanvas = (props: any) => {
             let ctx = (document.querySelector('.DecayCanvas') as HTMLCanvasElement).getContext(
                 '2d'
             ) as CanvasRenderingContext2D;
-            gm.world.tiles?.forEach((tileArr: ITile[]) => {
+            props.gameMaster.world.tiles?.forEach((tileArr: ITile[]) => {
                 tileArr.forEach((tile) => {
+                    props.player.tile.render(ctx);
                     if (tile.render !== undefined) {
                         tile.render(ctx, tile.coords, tile.noise);
                     }

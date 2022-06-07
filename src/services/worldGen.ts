@@ -90,6 +90,8 @@ export const initWorldTiles = (
                 cell: [i, j],
                 coords: [offsetX, offsetY],
                 noise: simplexMap[i][j],
+                tileWidth: cWidth,
+                tileHeight: cHeight,
                 // Render Template
                 // TODO: Decouple render to allow custom user injection. Use 'tileRender' callback function.
                 render: (ctx: CanvasRenderingContext2D, coords: number[], noise: number) => {
