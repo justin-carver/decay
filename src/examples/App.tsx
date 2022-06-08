@@ -1,34 +1,39 @@
-import { MutableRefObject, ReactElement, useEffect, useState, useRef } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import Decay from '../Decay';
 import DecayCanvas from '../components/DecayCanvas';
 import GameMaster from '../components/gameMaster';
-import Player from '../components/player';
+import Player, { IPlayer } from '../components/player';
+import Input from '../services/input';
+import { initInputActions } from './exampleInput';
 
 // App.tsx represents final product for end user.
 const App = (): ReactElement => {
-    const [player, setPlayer] = useState(Player.createPlayer());
-    const [gm, setGameMaster] = useState(GameMaster.createGameMaster());
+    const [player, updatePlayer] = useState(Player.createPlayer());
+    const [gm, updateGameMaster] = useState(GameMaster.createGameMaster());
+    const [input, updateInput] = useState(Input.createInput());
+
+    // Init custom input commands and their respective functions.
+    initInputActions(input, player, updatePlayer);
+
     useEffect(() => {
+        // Add event listener for input manager.
         document.addEventListener('keydown', (e) => {
-            // e.preventDefault();
             if (player.tile !== undefined) {
+                if (e.code === 'ArrowLeft') {
+                    input.queueAction('MOVE_LEFT', player);
+                }
                 if (e.code === 'ArrowRight') {
-                    console.log('movin!', player.tile.coords[1]);
-                    setPlayer(
-                        Object.assign(player, {
-                            tile: {
-                                ...player.tile,
-                                coords: [
-                                    player.tile.coords[0],
-                                    player.tile.coords[1] + player.tile.tileWidth,
-                                ],
-                            },
-                        })
-                    );
+                    input.queueAction('MOVE_RIGHT', player);
+                }
+                if (e.code === 'ArrowUp') {
+                    input.queueAction('MOVE_UP', player);
+                }
+                if (e.code === 'ArrowDown') {
+                    input.queueAction('MOVE_DOWN', player);
                 }
             }
         });
-    }, [player]);
+    }, []);
     return (
         <Decay>
             <DecayCanvas

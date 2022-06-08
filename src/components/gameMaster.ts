@@ -6,18 +6,18 @@
 import IWorld from '../services/world';
 import { generateWorld } from '../services/worldGen';
 
-export interface IGameMaster {
-    world: IWorld;
-    config: object;
-    update(...params: object[]): void;
-    createGameMaster(): IGameMaster;
-}
-
 export enum GameModes {
     Roguelike,
     Adventure,
     Creative,
     Custom,
+}
+
+export interface IGameMaster {
+    world: IWorld;
+    config: object;
+    update(...params: object[]): void;
+    createGameMaster(): IGameMaster;
 }
 
 // GameMaster config will set initial world parameters.
@@ -41,9 +41,10 @@ export const GameMaster: IGameMaster = {
         dev: 'stringy!!',
     },
     update: (...params: object[]) => {
-        const keywords = ['update', 'createGameMaster']; // function names
+        const keywords = ['update', 'createGameMaster']; // properties that are forbidden to update
         params.map((e: object) => {
             if (!keywords.includes(Object.keys(e)[0])) {
+                // Make sure the key exists.
                 if (GameMaster.hasOwnProperty(Object.keys(e)[0])) {
                     return Object.assign(GameMaster, e);
                 } else {

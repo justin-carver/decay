@@ -10,9 +10,7 @@ export const initEngine = (): object => {
     return {};
 };
 
-const Engine: IEngine = {
-    gameMaster: {},
-};
+const Engine: IEngine = {};
 
 Object.preventExtensions(Engine);
 export default Engine;

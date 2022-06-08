@@ -16,13 +16,25 @@ const Player: IPlayer = {
         tileHeight: 16, // * Should come from engine config
         noise: 0,
         render: (ctx: CanvasRenderingContext2D) => {
-            ctx.fillStyle = '#BB2266';
-            ctx.fillRect(
-                Player.tile?.coords[0] as number,
-                Player.tile?.coords[1] as number,
-                Player.tile?.tileWidth as number,
-                Player.tile?.tileHeight as number
-            );
+            if (Player.tile !== undefined) {
+                ctx.fillStyle = '	#FFAA1D';
+                ctx.fillRect(
+                    Player.tile.coords[0],
+                    Player.tile.coords[1],
+                    Player.tile.tileWidth,
+                    Player.tile.tileHeight
+                );
+
+                // // Tile Character
+                // Adds a TON of lag.
+                // ctx.fillStyle = '#000';
+                // ctx.font = 'bold 18px monospace'; // TODO: Add to config.
+                // ctx.fillText(
+                //     '@',
+                //     Player.tile.coords[0] + Player.tile.tileWidth / 2,
+                //     Player.tile.coords[1] + Player.tile.tileHeight / 2
+                // );
+            }
         },
     } as ITile,
     createPlayer: () => {

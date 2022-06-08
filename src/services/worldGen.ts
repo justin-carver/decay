@@ -98,17 +98,18 @@ export const initWorldTiles = (
                     // Tile Background Color
                     ctx.fillStyle = calculateTileColor(noise);
                     ctx.fillRect(coords[0], coords[1], cWidth, cHeight);
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
+                    // ctx.textAlign = 'center';
+                    // ctx.textBaseline = 'middle';
 
                     // Tile Outlines
                     ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
                     ctx.strokeRect(coords[0], coords[1], cWidth, cHeight);
 
-                    // Tile Character
-                    ctx.fillStyle = '#000';
-                    ctx.font = 'bold 18px monospace'; // TODO: Add to config.
-                    ctx.fillText('w', coords[0] + cWidth / 2, coords[1] + cHeight / 2);
+                    // // Tile Character
+                    // Adds a TON of lag.
+                    // ctx.fillStyle = '#000';
+                    // ctx.font = 'bold 18px monospace';
+                    // ctx.fillText('w', coords[0] + cWidth / 2, coords[1] + cHeight / 2);
                 },
             });
             offsetX += cWidth;
